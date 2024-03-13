@@ -5,7 +5,7 @@ List of tasks completed on an STM32.
 Task 1 - Start up
 
 | Task  | Name | Description | Completed |
-| ------------- | ------------- | ------------- |
+| ------------- |  ------------- | ------------- | ------------- |
 | 1 | Start up | Become familiar with setting up STM32CubeIDE, which is the program we use to program STM32F407G-DISC1 or STM32F411.  | ✅ |
 | 2 | LED  | In this task, you will use the LED lights and the switch on the STM32F4. | ✅ |
 | 3   | Temperaturesensor| In this task, you will become familiar with how to use I2C communication to retrieve data from a temperature sensor. Once you have successfully received temperature data, you will combine that knowledge with what you learned in the previous task. Finally, you will log the temperature data using USB.  | ✅ |
