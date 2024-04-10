@@ -25,7 +25,6 @@ void task3(I2C_HandleTypeDef *hi2c1){
 	}
 
 	// Compute temperature in celcius.
-
 	uint16_t temperature = (((uint16_t)buffer[0])<<4) | (((uint16_t)buffer[1])>>4); // Assume all bits are zero except the ones we occupy for tmp?
 	if ((temperature & 0x1000) == 0x1000 ){
 		// Temperature is negative
