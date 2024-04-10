@@ -97,11 +97,6 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  //int subtask = 2;  // Task can be 0, 1 or 2. Set this to switch between them.
-
-
-
-  //HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 
   /* USER CODE END 2 */
 
@@ -109,8 +104,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  task4_init(&hspi1);
-	  task4(&hspi1);
+	  task5(&hspi1);
 
 	  HAL_Delay(1000);
     /* USER CODE END WHILE */

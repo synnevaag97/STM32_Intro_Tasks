@@ -1,0 +1,3 @@
+../Drivers/LIS3DSH_Driver/lis3dsh_task5.c:5:5:lis3dsh_write	1
+../Drivers/LIS3DSH_Driver/lis3dsh_task5.c:17:5:lis3dsh_read	1
+../Drivers/LIS3DSH_Driver/lis3dsh_task5.c:29:5:lis3dsh_init	3
