@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -25,6 +26,7 @@
 #include "task2.h"
 #include "task3.h"
 #include "task4.h"
+#include "task5.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +49,14 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 
+osThreadId accTaskHandle;
+osThreadId tmpTaskHandle;
+osThreadId ledGreenTaskHandle;
+osThreadId ledOrangeTaskHandle;
+osThreadId ledRedTaskHandle;
+osThreadId ledBlueTaskHandle;
+osMessageQId myQ1Handle;
+osMutexId blinking_resourceHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -56,6 +66,13 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
+void acc_fetch(void const * argument);
+void tmp_fetch(void const * argument);
+void ledGreen(void const * argument);
+void ledOrange(void const * argument);
+void ledRed(void const * argument);
+void ledBlue(void const * argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -94,18 +111,74 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  MX_USB_DEVICE_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
+  /* Create the mutex(es) */
+  /* definition and creation of blinking_resource */
+  osMutexDef(blinking_resource);
+  blinking_resourceHandle = osMutexCreate(osMutex(blinking_resource));
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of myQ1 */
+  osMessageQDef(myQ1, 8, uint16_t);
+  myQ1Handle = osMessageCreate(osMessageQ(myQ1), NULL);
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of accTask */
+  osThreadDef(accTask, acc_fetch, osPriorityLow, 0, 1000);
+  accTaskHandle = osThreadCreate(osThread(accTask), NULL);
+
+  /* definition and creation of tmpTask */
+  osThreadDef(tmpTask, tmp_fetch, osPriorityLow, 0, 1000);
+  tmpTaskHandle = osThreadCreate(osThread(tmpTask), NULL);
+
+  /* definition and creation of ledGreenTask */
+  osThreadDef(ledGreenTask, ledGreen, osPriorityNormal, 0, 128);
+  ledGreenTaskHandle = osThreadCreate(osThread(ledGreenTask), NULL);
+
+  /* definition and creation of ledOrangeTask */
+  osThreadDef(ledOrangeTask, ledOrange, osPriorityNormal, 0, 128);
+  ledOrangeTaskHandle = osThreadCreate(osThread(ledOrangeTask), NULL);
+
+  /* definition and creation of ledRedTask */
+  osThreadDef(ledRedTask, ledRed, osPriorityNormal, 0, 128);
+  ledRedTaskHandle = osThreadCreate(osThread(ledRedTask), NULL);
+
+  /* definition and creation of ledBlueTask */
+  osThreadDef(ledBlueTask, ledBlue, osPriorityNormal, 0, 128);
+  ledBlueTaskHandle = osThreadCreate(osThread(ledBlueTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  task5(&hspi1);
-
 	  HAL_Delay(1000);
     /* USER CODE END WHILE */
 
@@ -287,6 +360,16 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+
+void blink_led_5_time(uint16_t GPIO_PIN){
+	osMutexWait(blinking_resourceHandle, HAL_MAX_DELAY);
+	for (int i = 0; i < 5; i++){
+		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN);
+		HAL_Delay(500);
+	}
+	osMutexRelease(blinking_resourceHandle);
+}
+
 /*
  * Uncomment callback if using NVIC for task 4.
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -299,6 +382,152 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }*/
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_acc_fetch */
+/**
+  * @brief  Function implementing the accTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_acc_fetch */
+void acc_fetch(void const * argument)
+{
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  uint8_t buffer[100];
+  for(;;)
+  {
+	  sprintf((char*) &buffer, "In for loop for acc \r\n");
+	  size_t length = strlen((char*) &buffer);
+	  CDC_Transmit_FS(buffer, length);
+	  //task5(&hspi1);
+    osDelay(100);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_tmp_fetch */
+/**
+* @brief Function implementing the tmpTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_tmp_fetch */
+void tmp_fetch(void const * argument)
+{
+  /* USER CODE BEGIN tmp_fetch */
+	/* Infinite loop */
+	uint8_t buffer[100];
+	for(;;)
+	{
+		sprintf((char*) &buffer, "In for loop for temp \r\n");
+		size_t length = strlen((char*) &buffer);
+		CDC_Transmit_FS(buffer, length);
+
+		//task3(&hi2c1);
+		osDelay(100);
+	}
+  /* USER CODE END tmp_fetch */
+}
+
+/* USER CODE BEGIN Header_ledGreen */
+/**
+* @brief Function implementing the ledGreenTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ledGreen */
+void ledGreen(void const * argument)
+{
+  /* USER CODE BEGIN ledGreen */
+  /* Infinite loop */
+  for(;;)
+  {
+	blink_led_5_time(GPIO_PIN_12);
+    osDelay(1);
+  }
+  /* USER CODE END ledGreen */
+}
+
+/* USER CODE BEGIN Header_ledOrange */
+/**
+* @brief Function implementing the ledOrangeTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ledOrange */
+void ledOrange(void const * argument)
+{
+  /* USER CODE BEGIN ledOrange */
+  /* Infinite loop */
+  for(;;)
+  {
+	  blink_led_5_time(GPIO_PIN_13);
+    osDelay(1);
+  }
+  /* USER CODE END ledOrange */
+}
+
+/* USER CODE BEGIN Header_ledRed */
+/**
+* @brief Function implementing the ledRedTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ledRed */
+void ledRed(void const * argument)
+{
+  /* USER CODE BEGIN ledRed */
+  /* Infinite loop */
+  for(;;)
+  {
+	  blink_led_5_time(GPIO_PIN_14);
+    osDelay(1);
+  }
+  /* USER CODE END ledRed */
+}
+
+/* USER CODE BEGIN Header_ledBlue */
+/**
+* @brief Function implementing the ledBlueTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ledBlue */
+void ledBlue(void const * argument)
+{
+  /* USER CODE BEGIN ledBlue */
+  /* Infinite loop */
+  for(;;)
+  {
+	  blink_led_5_time(GPIO_PIN_15);
+    osDelay(1);
+  }
+  /* USER CODE END ledBlue */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

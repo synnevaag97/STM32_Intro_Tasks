@@ -40,3 +40,11 @@ Both these cases require us to activate interrupt in the accelerometer and set t
 
 ## Task5
 Created a simple driver for the accelerometer with a init, write and read function. These functions then replaced the code previously implemented in task 4. The driver is found under Drivers folder. 
+
+
+
+## Task 6
+
+Threads and mutex was created with the CMSIS_V2 interface with FreeRTOS. First i have two threads running the temperature and accelerometer tasks (3 and 4/5). Then i add four new threads to blink the four leds on the board. I then implement a mutex such that only one led blinks at a time, instead of all leds blinking asynchrounsly. 
+
+Queue was then implemented with the CMSIS_V1 interface with FreeRTOS. The queue was not implemented completely. 
