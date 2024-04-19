@@ -1,0 +1,9 @@
+../Core/Src/main.c:77:5:main	200	dynamic
+../Core/Src/main.c:209:6:SystemClock_Config	88	static
+../Core/Src/main.c:255:13:MX_I2C1_Init	8	static
+../Core/Src/main.c:289:13:MX_I2S3_Init	8	static
+../Core/Src/main.c:323:13:MX_SPI1_Init	8	static
+../Core/Src/main.c:359:13:MX_DMA_Init	16	static
+../Core/Src/main.c:377:13:MX_GPIO_Init	56	static
+../Core/Src/main.c:416:6:sinus_wave_generator	184	static
+../Core/Src/main.c:450:6:Error_Handler	4	static,ignoring_inline_asm
