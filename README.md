@@ -15,6 +15,8 @@ List of tasks completed on an STM32.
 | 7 | DAC and DMA| Use the CS43L22, which is an Audio-DAC with an integrated amplifier. Generate tones with different frequencies that will eventually be combined with accelerometer data. | ✅ |
 <!---               | 3B   | Oscilloskop | This task provides an introduction and basic training in the use of an oscilloscope. First, some very simple measurements generated from a signal generator will be taken. Then, I²C measurements to and from a temperature sensor will be decoded from the oscilloscope.  |  |-->
 
+For more projects and explanations take a look at:https://legacy.cs.indiana.edu/~geobrown/book.pdf.
+
 ## Task 1
 Downloaded STM32CubeIDE from https://www.st.com/en/development-tools/stm32cubeide.html. Familiarized myself with the STM32F4 user manual and datasheet found at https://www.st.com/en/microcontrollers-microprocessors/stm32f4-series/documentation.html. 
 Created a new project, choose the STM32F407G-DISC1, and the reset all pins and clock configrautions before starting this new project. 
